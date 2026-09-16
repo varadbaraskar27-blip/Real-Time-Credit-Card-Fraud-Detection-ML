@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="UTF-8">
+
+<title>Fraud Detection Dashboard</title>
+
+<style>
+
+  body {
+    font-family: Arial, sans-serif;
+    margin: 2rem;
+    background: #111;
+    color: #eee;
+  }
+
+  h1 {
+    color: #fff;
+  }
+
+  .stats {
+    display: flex;
+    gap: 2rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .stat-box {
+    background: #222;
+    padding: 1rem 1.5rem;
+    border-radius: 8px;
+  }
+
+  .stat-label {
+    color: #999;
+    font-size: 0.85rem;
+  }
+
+  .stat-value {
+    font-size: 2rem;
+    font-weight: bold;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  th,
+  td {
+    padding: 0.5rem 0.75rem;
+    text-align: left;
+    border-bottom: 1px solid #333;
+  }
+
+  th {
+    color: #999;
+    font-weight: normal;
+  }
+
+  .fraud-row {
+    background: #3a1414;
+  }
+
+  .ok-row {
+    background: #14231a;
+  }
+
+</style>
+
+</head>
+
+
+<body>
+
+<h1>Real-time fraud detection dashboard</h1>
+
+
+<div class="stats">
+
+  <div class="stat-box">
+
+    <div class="stat-label">
+      Total transactions
+    </div>
+
+    <div
+      class="stat-value"
+      id="total"
+    >
+      0
+    </div>
+
+  </div>
+
+
+  <div class="stat-box">
+
+    <div class="stat-label">
+      Fraud flagged
+    </div>
+
+    <div
+      class="stat-value"
+      id="fraud"
+      style="color:#ff6b6b;"
+    >
+      0
+    </div>
+
+  </div>
+
+</div>
+
+
+<table>
+
+  <thead>
+
+    <tr>
+      <th>Time</th>
+      <th>Amount</th>
+      <th>Prediction</th>
+      <th>Probability</th>
+      <th>Actual</th>
+    </tr>
+
+  </thead>
+
+  <tbody id="rows"></tbody>
+
+</table>
+
+
+<script>
+
+
+const API = "http://localhost:8000";
+
+
+/*
+====================================================
+DASHBOARD SESSION
+
+First time dashboard opens:
+    Create session start time.
+
+Refresh:
+    Same session start time is reused.
+
+So refresh will NOT reset the count.
+====================================================
+*/
+
+let dashboardStartTime =
+    sessionStorage.getItem("fraudDashboardStartTime");
+
+
+if (!dashboardStartTime) {
+
+    dashboardStartTime =
+        new Date().toISOString();
+
+    sessionStorage.setItem(
+        "fraudDashboardStartTime",
+        dashboardStartTime
+    );
+}
+
+
+console.log(
+    "Dashboard session started at:",
+    dashboardStartTime
+);
+
+
+
+async function refresh() {
+
+    try {
+
+        /*
+        Get only transactions created
+        after this dashboard session started.
+        */
+
+        const predictions = await fetch(
+            API +
+            "/predictions?limit=1000&since=" +
+            encodeURIComponent(
+                dashboardStartTime
+            )
+        )
+        .then(r => r.json());
+
+
+        /*
+        TOTAL TRANSACTIONS
+
+        This is only the transactions
+        belonging to this dashboard session.
+        */
+
+        document.getElementById("total").innerText =
+            predictions.length;
+
+
+        /*
+        FRAUD COUNT
+        */
+
+        document.getElementById("fraud").innerText =
+            predictions.filter(
+                p => p.predicted_fraud === 1
+            ).length;
+
+
+        /*
+        UPDATE TABLE
+        */
+
+        const tbody =
+            document.getElementById("rows");
+
+        tbody.innerHTML = "";
+
+
+        predictions.forEach(p => {
+
+            const tr =
+                document.createElement("tr");
+
+
+            /*
+            Row color
+            */
+
+            tr.className =
+                p.predicted_fraud === 1
+                    ? "fraud-row"
+                    : "ok-row";
+
+
+            tr.innerHTML =
+
+                "<td>" +
+                p.time +
+                "</td>" +
+
+                "<td>" +
+                p.amount +
+                "</td>" +
+
+                "<td>" +
+                (
+                    p.predicted_fraud === 1
+                        ? "FRAUD"
+                        : "OK"
+                ) +
+                "</td>" +
+
+                "<td>" +
+                (
+                    p.probability * 100
+                ).toFixed(1) +
+                "%" +
+                "</td>" +
+
+                "<td>" +
+                p.actual_class +
+                "</td>";
+
+
+            tbody.appendChild(tr);
+
+        });
+
+
+    } catch (e) {
+
+        console.error(
+            "API se connect nahi ho paya. api.py chal raha hai kya?",
+            e
+        );
+
+    }
+
+}
+
+
+/*
+====================================================
+FIRST LOAD
+====================================================
+*/
+
+refresh();
+
+
+/*
+====================================================
+AUTO REFRESH
+
+Every 2 seconds
+====================================================
+*/
+
+setInterval(
+    refresh,
+    2000
+);
+
+</script>
+
+</script>
+
+
+</body>
+
+</html>

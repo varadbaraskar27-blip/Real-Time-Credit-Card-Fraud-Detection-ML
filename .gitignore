@@ -1,0 +1,15 @@
+# mongo URI
+.env
+
+# Virtual environment
+venv/
+
+# Python cache
+__pycache__/
+*.pyc
+
+#  Dataset  
+data/creditcard.csv
+
+# Trained model files 
+*.pkl
