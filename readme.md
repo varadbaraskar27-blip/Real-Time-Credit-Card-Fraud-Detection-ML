@@ -67,10 +67,10 @@ Trained a Random Forest classifier with `class_weight="balanced"` to handle the 
 
 2. Download the dataset from Kaggle and place it at `data/creditcard.csv`.
 
-3. Copy `.env.example` to `.env` and add your MongoDB Atlas connection string:
-   ```
-   MONGO_URI=mongodb+srv://<username>:<password>@<cluster-url>/?retryWrites=true&w=majority
-   ```
+3.Create a `.env` file in the project root and add your MongoDB Atlas connection string:
+
+MONGO_URI=mongodb+srv://<username>:<password>@<cluster-url>/
+
 
 4. Start Kafka locally:
    ```bash
