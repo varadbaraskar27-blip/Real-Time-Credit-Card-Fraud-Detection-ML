@@ -1,0 +1,7 @@
+pandas
+scikit-learn
+kafka-python
+fastapi
+uvicorn
+pymongo
+python-dotenv
