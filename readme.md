@@ -1,5 +1,10 @@
 # Real-Time Fraud Detection Pipeline using Apache Kafka
 
+## 🎥 Project Demo
+
+Check out the complete working demo of the real-time credit card fraud detection pipeline:
+
+**Demo Video:** `creditcard_fraud.mp4`
 
 https://github.com/user-attachments/assets/bca3d6d3-2582-40f4-85c5-f22c30789fed
 
