@@ -1,5 +1,9 @@
 # Real-Time Fraud Detection Pipeline using Apache Kafka
 
+
+https://github.com/user-attachments/assets/bca3d6d3-2582-40f4-85c5-f22c30789fed
+
+
 A real-time machine learning pipeline that streams credit card transactions through Apache Kafka, scores each one for fraud using a trained model, and displays live predictions on a dashboard.
 
 ## Architecture
